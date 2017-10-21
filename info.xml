@@ -1,26 +1,30 @@
 <?xml version="1.0"?>
 <extension key="com.ginkgostreet.giftmembership" type="module">
   <file>giftmembership</file>
-  <name>FIXME</name>
-  <description>FIXME</description>
+  <name>Gift Membership</name>
+  <description>
+    Makes gift memberships possible via a public contribution page's honoree
+    section. The soft-credited contact will be made the owner of the membership.
+    Administrators can specify which soft credit types trigger the behavior.
+    Note that the configuration is not form-specific and will trigger regardless
+    of when or how the soft credit is created. Aside from the administrator's
+    settings screen, this extension has no interface elements.
+  </description>
   <license>AGPL-3.0</license>
   <maintainer>
     <author>Ginkgo Street Lab</author>
     <email>inquire@ginkgostreet.com</email>
   </maintainer>
   <urls>
-    <url desc="Main Extension Page">http://FIXME</url>
-    <url desc="Documentation">http://FIXME</url>
-    <url desc="Support">http://FIXME</url>
+    <url desc="Documentation">https://github.com/ginkgostreet/com.ginkgostreet.giftmembership</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <releaseDate>2017-10-21</releaseDate>
-  <version>1.0</version>
-  <develStage>alpha</develStage>
+  <version>0.1</version>
   <compatibility>
     <ver>4.7</ver>
   </compatibility>
-  <comments>This is a new, undeveloped module</comments>
+  <comments></comments>
   <civix>
     <namespace>CRM/Giftmembership</namespace>
   </civix>
