@@ -3,7 +3,7 @@
   <item>
     <path>civicrm/admin/member/giftmembership</path>
     <page_callback>CRM_Giftmembership_Form_Setting</page_callback>
-    <title>Setting</title>
+    <title>Gift Membership Settings</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
 </menu>

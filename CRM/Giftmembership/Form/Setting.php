@@ -8,16 +8,23 @@ use CRM_Giftmembership_ExtensionUtil as E;
  * @see https://wiki.civicrm.org/confluence/display/CRMDOC/QuickForm+Reference
  */
 class CRM_Giftmembership_Form_Setting extends CRM_Core_Form {
-  public function buildQuickForm() {
 
-    // add form elements
-    $this->add(
-      'select', // field type
-      'favorite_color', // field name
-      'Favorite Color', // field label
-      $this->getColorOptions(), // list of options
-      TRUE // is required
-    );
+  private $settingNameSoftCreditTypes = 'giftmembership_soft_credit_types';
+  private $settingMetadataSoftCreditTypes = array();
+
+  public function setDefaultValues() {
+    $defaults = array();
+    $typeIds = Civi::settings()->get('giftmembership_soft_credit_types');
+
+    $defaults[$this->settingNameSoftCreditTypes] = array_fill_keys($typeIds, 1);
+
+    return $defaults;
+  }
+
+  public function buildQuickForm() {
+    $metadata = $this->getSettingMetadataSoftCreditTypes();
+    $this->addCheckBox($metadata['name'], $metadata['title'], $metadata['options']);
+
     $this->addButtons(array(
       array(
         'type' => 'submit',
@@ -27,31 +34,43 @@ class CRM_Giftmembership_Form_Setting extends CRM_Core_Form {
     ));
 
     // export form elements
-    $this->assign('elementNames', $this->getRenderableElementNames());
+    $this->assign('elementNames', $this->getRenderableElementMetadata());
     parent::buildQuickForm();
   }
 
   public function postProcess() {
     $values = $this->exportValues();
-    $options = $this->getColorOptions();
-    CRM_Core_Session::setStatus(E::ts('You picked color "%1"', array(
-      1 => $options[$values['favorite_color']],
-    )));
+    $softCreditTypes = CRM_Utils_Array::value($this->settingNameSoftCreditTypes, $values, array());
+
+    civicrm_api3('Setting', 'create', array(
+      $this->settingNameSoftCreditTypes => array_keys($softCreditTypes),
+    ));
+
+    CRM_Core_Session::setStatus(E::ts('Settings saved.'), NULL, 'success');
+
     parent::postProcess();
   }
 
-  public function getColorOptions() {
-    $options = array(
-      '' => E::ts('- select -'),
-      '#f00' => E::ts('Red'),
-      '#0f0' => E::ts('Green'),
-      '#00f' => E::ts('Blue'),
-      '#f0f' => E::ts('Purple'),
-    );
-    foreach (array('1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e') as $f) {
-      $options["#{$f}{$f}{$f}"] = E::ts('Grey (%1)', array(1 => $f));
+  /**
+   * Wraps api.Setting.getfields. Adds 'options' array element with field
+   * options represented as value => label.
+   *
+   * @return array
+   */
+  protected function getSettingMetadataSoftCreditTypes() {
+    if (empty($this->settingMetadataSoftCreditTypes)) {
+      $result = civicrm_api3('Setting', 'getfields', array(
+        'filters' => array('name' => $this->settingNameSoftCreditTypes),
+      ));
+      $this->settingMetadataSoftCreditTypes = $result['values'][$this->settingNameSoftCreditTypes];
+
+      $options = civicrm_api3('ContributionSoft', 'getoptions', array(
+        'field' => 'soft_credit_type_id',
+      ));
+      $this->settingMetadataSoftCreditTypes['options'] = array_flip($options['values']);
     }
-    return $options;
+
+    return $this->settingMetadataSoftCreditTypes;
   }
 
   /**
@@ -59,20 +78,22 @@ class CRM_Giftmembership_Form_Setting extends CRM_Core_Form {
    *
    * @return array (string)
    */
-  public function getRenderableElementNames() {
+  public function getRenderableElementMetadata() {
     // The _elements list includes some items which should not be
     // auto-rendered in the loop -- such as "qfKey" and "buttons".  These
     // items don't have labels.  We'll identify renderable by filtering on
     // the 'label'.
-    $elementNames = array();
+    $elementNameDescription = array();
     foreach ($this->_elements as $element) {
       /** @var HTML_QuickForm_Element $element */
       $label = $element->getLabel();
       if (!empty($label)) {
-        $elementNames[] = $element->getName();
+        $fieldName = $element->getName();
+        $metadata = $this->getSettingMetadataSoftCreditTypes();
+        $elementNameDescription[$fieldName] = $metadata['description'];
       }
     }
-    return $elementNames;
+    return $elementNameDescription;
   }
 
 }
