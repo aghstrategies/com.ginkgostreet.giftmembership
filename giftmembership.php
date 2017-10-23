@@ -147,6 +147,6 @@ function giftmembership_civicrm_navigationMenu(&$menu) {
  * @link https://docs.civicrm.org/dev/en/master/hooks/hook_civicrm_container/
  */
 function giftmembership_civicrm_container($container) {
-  $container->findDefinition('dispatcher')->addMethodCall('addListener', array('civi.dao.postInsert', array('CRM_Giftmembership_Listener_ContributionSoft', 'upsert')));
-  $container->findDefinition('dispatcher')->addMethodCall('addListener', array('civi.dao.postUpdate', array('CRM_Giftmembership_Listener_ContributionSoft', 'upsert')));
+  $container->findDefinition('dispatcher')->addMethodCall('addListener', array('civi.dao.postInsert', array('CRM_Giftmembership_Listener_MembershipPayment', 'upsert')));
+  $container->findDefinition('dispatcher')->addMethodCall('addListener', array('civi.dao.postUpdate', array('CRM_Giftmembership_Listener_MembershipPayment', 'upsert')));
 }

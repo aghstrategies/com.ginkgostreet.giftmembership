@@ -12,42 +12,33 @@ class CRM_Giftmembership_Util {
   const settingNameSoftCreditTypes = 'giftmembership_soft_credit_types';
 
   /**
-   * Determines whether a soft contribution qualifies for additional processing
-   * by this extension.
+   * Gets the contact IDs for giftees of a membership based on the configured
+   * triggering soft credit contribution type(s).
    *
-   * @param CRM_Contribute_DAO_ContributionSoft $softContribution
-   * @return boolean
+   * @param CRM_Member_DAO_MembershipPayment $payment
+   * @return array
+   *   Contact IDs.
    */
-  public static function softContributionTypeQualifies(CRM_Contribute_DAO_ContributionSoft $softContribution) {
-    $qualifingTypes = Civi::settings()->get(self::settingNameSoftCreditTypes);
-    return in_array($softContribution->soft_credit_type_id, $qualifingTypes);
+  public static function getMembershipGiftees(CRM_Member_DAO_MembershipPayment $payment) {
+    $qualifyingSoftCreditTypes = Civi::settings()->get(self::settingNameSoftCreditTypes);
+    $softContributions = civicrm_api3('ContributionSoft', 'get', array(
+      'contribution_id' => $payment->contribution_id,
+      'soft_credit_type' => array('IN' => $qualifyingSoftCreditTypes),
+    ));
+    return array_unique(array_column($softContributions['values'], 'contact_id'));
   }
 
   /**
-   * For any memberships associated with the passed soft contribution, changes
-   * ownership to match that of the soft contribution.
+   * Changes the ownership of a membership to the specified contact.
    *
-   * @param CRM_Contribute_DAO_ContributionSoft $softContribution
+   * @param int|string $membershipId
+   * @param int}string $contactId
    */
-  public static function transferMembershipToGiftee(CRM_Contribute_DAO_ContributionSoft $softContribution) {
-    $payment = civicrm_api3('MembershipPayment', 'get', array(
-      'contribution_id' => $softContribution->contribution_id,
-      // no point in pulling back memberships already owned by the giftee
-      'membership_id.contact_id' => array('!=' => $softContribution->contact_id),
+  public static function transferMembershipToGiftee($membershipId, $contactId) {
+    civicrm_api3('Membership', 'create', array(
+      'contact_id' => $contactId,
+      'id' => $membershipId,
     ));
-
-    // The typical case will be that exactly one membership matches, but it's
-    // possible (at least the data schema supports it) that one contribution
-    // could be related to multiple memberships, or that the contribution
-    // qualifies but is not related to a membership. This approach covers all
-    // the bases.
-    $membershipIds = array_column($payment['values'], 'membership_id');
-    foreach ($membershipIds as $mId) {
-      $test = civicrm_api3('Membership', 'create', array(
-        'contact_id' => $softContribution->contact_id,
-        'id' => $mId,
-      ));
-    }
   }
 
 }
