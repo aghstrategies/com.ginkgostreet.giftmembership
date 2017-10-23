@@ -7,7 +7,7 @@
     section. The soft-credited contact will be made the owner of the membership.
     Administrators can specify which soft credit types trigger the behavior.
     Note that the configuration is not form-specific and will trigger regardless
-    of when or how the soft credit is created. Aside from the administrator's
+    of when or how the membership payment is made. Aside from the administrator's
     settings screen, this extension has no interface elements.
   </description>
   <license>AGPL-3.0</license>
@@ -19,7 +19,7 @@
     <url desc="Documentation">https://github.com/ginkgostreet/com.ginkgostreet.giftmembership</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2017-10-21</releaseDate>
+  <releaseDate>2017-10-23</releaseDate>
   <version>0.1</version>
   <compatibility>
     <ver>4.7</ver>
