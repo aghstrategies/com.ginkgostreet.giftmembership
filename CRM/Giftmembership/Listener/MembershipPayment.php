@@ -8,7 +8,7 @@ class CRM_Giftmembership_Listener_MembershipPayment {
    * @param \Symfony\Component\EventDispatcher\Event $event
    * @return void
    */
-  public static function upsert(\Symfony\Component\EventDispatcher\Event $event) {
+  public static function onUpsert(\Symfony\Component\EventDispatcher\Event $event) {
     // This basic qualification could be moved to an intermediary listener/dispatcher.
     if (!isset($event->object) || !is_a($event->object, 'CRM_Member_DAO_MembershipPayment')) {
       return;
